@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Price Predictor</title>
+
+    <style>
+        body {
+            background-color: #154360;
+        }
+
+        form {
+            border: 2px solid black;
+            background-color: white;
+            margin: 2% 20% auto 20%;
+        }
+        .form_details {
+            padding: 1% 5% 1% 5%;
+            margin:0;
+        }
+
+        h1,h2,h3 {
+            text-align: center;
+            color: #4A235A;
+            font-family: Times New Roman,Georgia;
+        }
+        h2,h3 {
+            color: #1B2631;
+        }
+        .form_header {
+            padding: .75rem 1.25rem;
+            margin-bottom: 0;
+            background-color: #EAF2F8;
+            border-bottom: 1px solid rgba(0,0,0,.125);
+        }
+
+        label {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        select {
+          width: 100%;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 4px;
+          background-color: #f1f1f1;
+        }
+
+        input[type=number] {
+          width: 100%;
+          padding: 10px 20px;
+          margin: 8px 0;
+          box-sizing: border-box;
+          border: 3px solid #ccc;
+          -webkit-transition: 0.5s;
+          transition: 0.5s;
+          outline: none;
+          border-radius: 4px;
+        }
+
+        input[type=number]:focus {
+          border: 3px solid #555;
+        }
+
+        input[type=submit] {
+          background-color: #2874A6;
+          color: white;
+          padding: 12px 20px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          width: 100%;
+        }
+
+        input[type=submit]:hover {
+          background-color: #336B87;
+        }
+    </style>
+</head>
+<body>
+
+    <form action="/predict" method="POST">
+
+        <div class="form_header">
+            <h1>Predict the price of your old car</h1>
+        </div>
+
+        <br>
+
+        <div class="form_details">
+
+            {% if company_list %}
+                <label for="company">Select the brand</label>
+                <br>
+                <select name="company" id="company" onchange="loadCarModels({{model_dict}})" required>
+                    <option value="">Select company</option>
+                    {% if company_list %}
+                        {% for i in company_list %}
+                            <option value="{{i}}" {% if company=='{{i}}' %}selected{% endif %}>{{i}}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+
+                <br> <br>
+
+                <label for="model">Select the model</label>
+                <br>
+                <select name="model" id="model" required>
+                </select>
+
+                <br> <br>
+
+                <label for="year">Enter the year of purchase</label>
+                <br>
+                <input type="number" min="1990" max="2020" name="year" id="year" value="{{ request.form['year'] }}" required>
+
+                <br> <br>
+
+                <label for="kms">Enter the number of kms driven</label>
+                <br>
+                <input type="number" name="kms" id="kms" value="{{ request.form['kms'] }}" required>
+
+                <br> <br>
+
+                <label for="fuel">Select the fuel type</label>
+                <br>
+                <select name="fuel" id="fuel" required>
+                    {% if fuel_type_list %}
+                        {% for i in fuel_type_list %}
+                            <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+
+                <br> <br> <br>
+
+                <input type="submit" name="" value="Predict Price">
+
+            {% elif company_name %}
+                <h3>Brand: {{company_name}} </h3>
+
+                <h3>Model: {{model_name}} </h3>
+
+                <h3>Year of purchase: {{year}} </h3>
+
+                <h3>Kms driven: {{kms_driven}} </h3>
+
+                <h3>Fuel type: {{fuel_type}} </h3>
+            {% endif %}
+
+            <br>
+
+            {% if price %}
+                <h2>Estimated Price : ₹{{price}}</h2>
+                <br>
+                <h3><a href="{{ url_for('index') }}">Check for another car</a></h3>
+            {% endif %}
+
+        </div>
+
+    </form>
+
+    <script>
+        function loadCarModels(model_dict) {
+            var company = document.getElementById("company");
+            var car_model= document.getElementById("model");
+            car_model.value="";
+            car_model.innerHTML="";
+            var modelList = model_dict[company.value];
+            for(var i in modelList) {
+                var newOption= document.createElement("option");
+                newOption.value=modelList[i];
+                newOption.innerHTML=modelList[i];
+                car_model.options.add(newOption);
+            }
+        }
+    </script>
+</body>
+</html>
